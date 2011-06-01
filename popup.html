@@ -12,12 +12,65 @@ body {
 
 <script>
 
+DESC_CHART = {};
+DESC_FILLED = 0;
+SLUG_CHART = {};
+TAG_CHART = {};
+
+function generateTumblrCrushReport(cl) {
+    var rout = '<h2>Tumblr Crush Report</h2><ol>';
+    $.each(cl, function(x, v) {
+        var tcid = 'tc' + x;
+        rout += '<li id="' + tcid + '">' + v + '</li>';
+        var taurl = v + 'api/read/json/?type=regular&num=9&callback=?';
+        $.getJSON(taurl, function(d) {
+            DESC_CHART[tcid] = stripTags(d.tumblelog.description);
+            DESC_FILLED += 1;
+            var titlelist = [];
+            $.each(d.posts, function(x, p) {
+                var ptit = '';
+                if (p['regular-title']) {
+                    ptit = p['regular-title'];
+                } else {
+                    ptit = stripTags(p['regular-body']);
+                }
+                titlelist.push(prettyTrunc(ptit));
+            });
+            $('#'+tcid).append(' &mdash; ' + titlelist.join(', '));
+        });
+    });
+    rout += '</ol>';
+    return rout;
+}
+
+function prettyTrunc(s) {
+    var cm = 80;
+    if (s.length <= cm) {   
+        return s;
+    } else if (s.substr(cm, 1) == ' ') {
+        return s + '&hellip;';
+    } else {
+        c = cm;
+        while (s.substr(c, 1) != ' ' && c > 0) {
+           c -= 1; 
+        } 
+        return s.substr(0, c) + '&hellip;';
+    }
+}
+
+function stripTags(s) {
+    s = s.replace(/<script[^>]*>.*?<\/script>/igm, '');
+    return s.replace(/<.*?>/gm, '');
+}
+
 chrome.tabs.getSelected(null, function(tab) {
     chrome.tabs.sendRequest(tab.id, {op: "getCrushes"}, function(response) {
         console.log(response.message);
         console.log(response.crushout);
-        $('#mainfield').html(response.crushout);
+        var crushreport = generateTumblrCrushReport(response.crushout);
+        $('#mainfield').html(crushreport);
     });
 });
+
 
 </script>

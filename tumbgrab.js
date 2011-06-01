@@ -4,13 +4,8 @@ function getCrushes() {
     $('#crushes a').each(function(x) {
         crushlist.push($(this).attr('href'));
     });
-
     console.log("crushlist.length=" + crushlist.length);
-
-    crushlist = $.map(crushlist, function(v) {
-        return '<li>' + v + '</li>';
-    });
-    return '<ol>' + crushlist.join('\n') + '</ol>';
+    return crushlist;
 }
 
 
