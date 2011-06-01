@@ -1,0 +1,23 @@
+<div id="mainfield"></div>
+
+<style>
+body {
+    font-family:sans-serif;
+    min-width:480px;
+    overflow-x:hidden;
+}
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+
+<script>
+
+chrome.tabs.getSelected(null, function(tab) {
+    chrome.tabs.sendRequest(tab.id, {op: "getCrushes"}, function(response) {
+        console.log(response.message);
+        console.log(response.crushout);
+        $('#mainfield').html(response.crushout);
+    });
+});
+
+</script>

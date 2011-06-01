@@ -1,0 +1,20 @@
+{
+    "name": "Tumbcrusher",
+    "version": "1.0",
+    "description": "Tumblr Crushes Report",
+    "browser_action": {
+        "default_icon": "icon.png",
+        "popup": "popup.html"
+    },
+    "content_scripts": [
+        {
+            "matches": ["http://www.tumblr.com/*"],
+            "js": ["jquery.js", "tumbgrab.js"]
+        }
+    ],
+    "permissions": [
+        "tabs",
+        "http://api.flicker.com",
+        "https://ajax.googleapis.com/"
+    ]
+}
