@@ -12,14 +12,15 @@ body {
 
 <script>
 
-DESC_CHART = {};
-DESC_FILLED = 0;
-SLUG_CHART = {};
-TAG_CHART = {};
+var DESC_CHART = {};
+var DESC_FILLED = 0;
+var SLUG_CHART = {};
+var TAG_CHART = {};
 
 function generateTumblrCrushReport(cl) {
     var rout = '<h2>Tumblr Crush Report</h2><ol>';
-    $.each(cl, function(x, v) {
+    $.each(cl, function(x, c) {
+        var v = c.href;
         var tcid = 'tc' + x;
         rout += '<li id="' + tcid + '">' + v + '</li>';
         var taurl = v + 'api/read/json/?type=regular&num=9&callback=?';

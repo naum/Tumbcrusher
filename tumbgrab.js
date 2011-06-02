@@ -2,7 +2,11 @@
 function getCrushes() {
     var crushlist = [];
     $('#crushes a').each(function(x) {
-        crushlist.push($(this).attr('href'));
+        crushlist.push({
+          burl: $(this).css('background-image'),
+          href: $(this).attr('href'),
+          title: $(this).attr('title')
+        });
     });
     console.log("crushlist.length=" + crushlist.length);
     return crushlist;
