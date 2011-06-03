@@ -75,10 +75,11 @@ function generateTumblrCrushReport(cl) {
 }
 
 function makeProfileImageHTML(l) {
-    var mr = l.match(/http:\/\/\S+[.]png/);
+    var mr = l.match(/http:\/\/\S+[.](gif|png)/);
     if (mr) {
+        var iurl = mr[0];
         var stylist = STY_PROF_PIC_LIST.slice(0);
-        stylist.unshift('background-image:url(' + mr + ')');
+        stylist.unshift('background-image:url(' + iurl + ')');
         var styh = 'style="' + stylist.join('; ') + '"';
         return '<div class="profpic" ' + styh + '></div>';
     }
@@ -91,6 +92,8 @@ function prettyLink(s) {
         ct = mr[1];
     } else {
         ct = s.replace(/^http:\/\//, '');
+        ct = ct.replace(/^www[.]/, '');
+        ct = ct.replace(/\/$/, '');
     }
     return '<strong><a href="' + s + '">' + ct + '</a></strong>';
 }
