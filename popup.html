@@ -1,10 +1,32 @@
 <div id="mainfield"></div>
+<div id="cpapanel">
+    <textarea id="cpabox" rows="12"></textarea>
+</div>
 
 <style>
 body {
     font-family:sans-serif;
     min-width:480px;
     overflow-x:hidden;
+}
+li {
+    margin-top:0.6em;
+    margin-bottom:0.6em;
+}
+textarea {
+    width: 100%;
+}
+.profpic {
+    padding: 0 0 6px 12px;
+    height: 96px;
+    width: 96px;
+    float: right;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: right;
+    border-radius: 32px;
+    -moz-border-radius: 32px;
+    -webkit-border-radius: 32px;
 }
 </style>
 
@@ -14,34 +36,63 @@ body {
 
 var DESC_CHART = {};
 var DESC_FILLED = 0;
-var SLUG_CHART = {};
-var TAG_CHART = {};
+var SEP_POST = ' <span style="color:#666;">&#8213;</span> ';
+var SEP_TUMB = ' <span style="color:#999;">&#8258;</span> ';
+var STY_PROF_PIC_LIST = [
+    'float:right', 'padding:0px 0px 6px 16px', 'height:96px', 
+    'width:96px', 'background-repeat:no-repeat', 'background-position:right',
+    'background-size:100%', 'margin-left:12px',
+    'border-radius:16px', '-moz-border-radius:16px', '-webkit-border-radius:16px'
+];
 
 function generateTumblrCrushReport(cl) {
-    var rout = '<h2>Tumblr Crush Report</h2><ol>';
+    var rout = '<h3>Tumblr Crush Report</h3><ol>';
     $.each(cl, function(x, c) {
         var v = c.href;
+        var il = makeProfileImageHTML(c.burl);
         var tcid = 'tc' + x;
-        rout += '<li id="' + tcid + '">' + v + '</li>';
+        rout += '<li id="' + tcid + '">' + il + prettyLink(v) + SEP_TUMB + '</li>';
         var taurl = v + 'api/read/json/?type=regular&num=9&callback=?';
         $.getJSON(taurl, function(d) {
             DESC_CHART[tcid] = stripTags(d.tumblelog.description);
             DESC_FILLED += 1;
             var titlelist = [];
             $.each(d.posts, function(x, p) {
-                var ptit = '';
+                var ptit = null;
                 if (p['regular-title']) {
                     ptit = p['regular-title'];
                 } else {
                     ptit = stripTags(p['regular-body']);
                 }
-                titlelist.push(prettyTrunc(ptit));
+                var plink = '<a href="' + p.url + '">' + prettyTrunc(ptit) + '</a>';
+                titlelist.push(plink);
             });
-            $('#'+tcid).append(' &mdash; ' + titlelist.join(', '));
+            $('#'+tcid).append(titlelist.join(SEP_POST));
         });
     });
     rout += '</ol>';
     return rout;
+}
+
+function makeProfileImageHTML(l) {
+    var mr = l.match(/http:\/\/\S+[.]png/);
+    if (mr) {
+        var stylist = STY_PROF_PIC_LIST.slice(0);
+        stylist.unshift('background-image:url(' + mr + ')');
+        var styh = 'style="' + stylist.join('; ') + '"';
+        return '<div class="profpic" ' + styh + '></div>';
+    }
+}
+
+function prettyLink(s) {
+    var ct = null;
+    var mr = s.match(/http:\/\/(\S+)[.]tumblr[.]com/);
+    if (mr) {
+        ct = mr[1];
+    } else {
+        ct = s.replace(/^http:\/\//, '');
+    }
+    return '<strong><a href="' + s + '">' + ct + '</a></strong>';
 }
 
 function prettyTrunc(s) {
@@ -49,7 +100,7 @@ function prettyTrunc(s) {
     if (s.length <= cm) {   
         return s;
     } else if (s.substr(cm, 1) == ' ') {
-        return s + '&hellip;';
+        return s.substr(0, cm) + '&hellip;';
     } else {
         c = cm;
         while (s.substr(c, 1) != ' ' && c > 0) {
@@ -57,6 +108,11 @@ function prettyTrunc(s) {
         } 
         return s.substr(0, c) + '&hellip;';
     }
+}
+
+function setCopyPasteBox() {
+    var h = $('#mainfield').html();
+    $('#cpabox').val(h);
 }
 
 function stripTags(s) {
@@ -70,6 +126,7 @@ chrome.tabs.getSelected(null, function(tab) {
         console.log(response.crushout);
         var crushreport = generateTumblrCrushReport(response.crushout);
         $('#mainfield').html(crushreport);
+        setTimeout(setCopyPasteBox, 3000);
     });
 });
 
