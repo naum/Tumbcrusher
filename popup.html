@@ -51,7 +51,8 @@ function generateTumblrCrushReport(cl) {
         var v = c.href;
         var il = makeProfileImageHTML(c.burl);
         var tcid = 'tc' + x;
-        rout += '<li id="' + tcid + '">' + il + prettyLink(v) + SEP_TUMB + '</li>';
+        rout += '<li style="clear:both;" id="' + tcid + '">' + il 
+                + prettyLink(v) + SEP_TUMB + '</li>';
         var taurl = v + 'api/read/json/?type=regular&num=9&callback=?';
         $.getJSON(taurl, function(d) {
             DESC_CHART[tcid] = stripTags(d.tumblelog.description);
